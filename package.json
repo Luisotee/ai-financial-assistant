@@ -1,0 +1,7 @@
+{
+  "name": "ai-financial-assistant",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Luis Otavio",
+  "license": "MIT"
+}

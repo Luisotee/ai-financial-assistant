@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "ai-financial-assistant-api"
+version = "0.1.0"
+description = "API for AI Financial Assistant"
+authors = ["Luis Otavio"]
+packages = [{include = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "^0.115.7"
+uvicorn = "^0.34.0"
+pydantic = "^2.10.6"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.4"
+httpx = "^0.28.1"
+pytest-cov = "^6.0.0"
+
+[build-system]
+requires = ["poetry-core>=2.0.0"]
+build-backend = "poetry.core.masonry.api"
