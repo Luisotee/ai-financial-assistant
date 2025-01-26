@@ -7,7 +7,8 @@ from src.agents.react_agent import create_agent
 class ChatService:
     def __init__(self):
         try:
-            self.agent = create_agent()
+            self.platform = "default"
+            self.agent = None
             self.config = {"configurable": {"thread_id": "default"}}
         except ValueError as e:
             raise HTTPException(status_code=500, detail=str(e))
@@ -20,6 +21,11 @@ class ChatService:
     ) -> str:
         print(f"Processing message from {user_id} on {platform}: {message}")
         try:
+            # Create or update agent if platform changes
+            if platform != self.platform:
+                self.platform = platform
+                self.agent = create_agent(platform)
+
             self.config = {
                 "configurable": {
                     "thread_id": f"{platform}_{user_id}",

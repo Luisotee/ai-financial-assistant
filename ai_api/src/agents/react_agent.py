@@ -6,7 +6,28 @@ from src.tools.search import get_search_tool
 import os
 
 
-def create_agent():
+def get_platform_prompt(platform: str) -> str:
+    base_prompt = """You are a helpful AI assistant specializing in financial and banking matters.
+Always provide accurate, clear, and concise information."""
+
+    platform_prompts = {
+        "whatsapp": """Format responses for WhatsApp:
+- Use emojis sparingly for emphasis 📱
+- Keep messages concise and easily readable on mobile
+- Use bullet points for lists
+- Split long responses into shorter messages""",
+        "telegram": """Format responses for Telegram:
+- Support for markdown formatting
+- Can use code blocks for data ```like this```
+- Use emojis when appropriate 🤖
+- Support for longer messages""",
+        "default": "Provide clear, professional responses with appropriate formatting.",
+    }
+
+    return f"{base_prompt}\n\n{platform_prompts.get(platform.lower(), platform_prompts['default'])}"
+
+
+def create_agent(platform: str = "default"):
     settings.validate_api_keys()
 
     memory = MemorySaver()
@@ -18,9 +39,13 @@ def create_agent():
         temperature=0.7,
     )
 
+    prompt = get_platform_prompt(platform)
+
     try:
         tools = [get_search_tool()]
-        return create_react_agent(model, tools, checkpointer=memory)
+        return create_react_agent(
+            model, tools, state_modifier=prompt, checkpointer=memory
+        )
     except Exception as e:
         print(f"Error creating agent: {str(e)}")
         raise
