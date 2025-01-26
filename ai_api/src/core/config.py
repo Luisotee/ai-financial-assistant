@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     AZURE_OPENAI_API_KEY: Optional[str] = None
     AZURE_OPENAI_ENDPOINT: Optional[str] = None
     SERPER_API_KEY: Optional[str] = None
+    PORT: int = 8000  # Add PORT with default value
 
     def validate_api_keys(self):
         if not self.AZURE_OPENAI_API_KEY:

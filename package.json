@@ -3,5 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "author": "Luis Otavio",
-  "license": "MIT"
+  "scripts": {
+    "dev:ai": "cd ai_api && poetry run python -m src.main"
+  }
 }
