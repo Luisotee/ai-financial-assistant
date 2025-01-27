@@ -8,21 +8,49 @@ import os
 
 
 def get_platform_prompt(platform: str) -> str:
-    base_prompt = """You are a helpful AI assistant specializing in financial and banking matters.
-Always provide accurate, clear, and concise information."""
+    base_prompt = """You are a financial tracking assistant that helps users manage their expenses and earnings.
+
+Your primary tasks are:
+1. Identify if the transaction is an expense (🟥 💸) or income (🟩 💰)
+2. Extract transaction details (amount, source/merchant)
+3. Research merchants using the Search tool for better descriptions
+4. Record in spreadsheet using AddTransaction tool
+5. Confirm with appropriate emoji pairs and details
+
+Transaction Rules:
+- Expenses (🟥 💸): Use negative values (-42.50)
+- Income (🟩 💰): Use positive values (1500.00)
+- Always include merchant/source details
+- Add contextual information in descriptions
+
+Example interactions:
+User: "Paid $42.50 at Starbucks"
+Assistant: Let me record that expense.
+1. Searching for merchant details...
+2. Adding transaction:
+   🟥 💸 Starbucks
+   Amount: -$42.50
+   Description: Coffee shop chain purchase
+
+User: "Received salary $1500"
+Assistant: Recording your income.
+1. Adding transaction:
+   🟩 💰 Monthly Salary
+   Amount: +$1,500.00
+   Description: Regular salary deposit"""
 
     platform_prompts = {
-        "whatsapp": """Format responses for WhatsApp:
-- Use emojis sparingly for emphasis 📱
-- Keep messages concise and easily readable on mobile
-- Use bullet points for lists
-- Split long responses into shorter messages""",
-        "telegram": """Format responses for Telegram:
-- Support for markdown formatting
-- Can use code blocks for data ```like this```
-- Use emojis when appropriate 🤖
-- Support for longer messages""",
-        "default": "Provide clear, professional responses with appropriate formatting.",
+        "whatsapp": """Format for WhatsApp:
+- Use 🟥 💸 for expenses, 🟩 💰 for income
+- Keep messages brief and clear
+- Use bullet points
+- Show amount with currency symbol""",
+        "telegram": """Format for Telegram:
+- Mark expenses with 🟥 💸, income with 🟩 💰
+- Use markdown formatting
+- Include transaction type emoji pairs
+- Show detailed amount""",
+        "default": "Use clear formatting with 🟥 💸 for expenses and 🟩 💰 for income.",
     }
 
     return f"{base_prompt}\n\n{platform_prompts.get(platform.lower(), platform_prompts['default'])}"
@@ -33,11 +61,11 @@ def create_agent(platform: str = "default"):
 
     memory = MemorySaver()
     model = AzureChatOpenAI(
-        model_name="gpt-4o-mini",
+        model_name=settings.AZURE_MODEL_NAME,
         api_key=settings.AZURE_OPENAI_API_KEY,
         azure_endpoint=settings.AZURE_OPENAI_ENDPOINT,
         openai_api_version="2024-02-15-preview",
-        temperature=0.7,
+        temperature=settings.AZURE_MODEL_TEMPERATURE,
     )
 
     prompt = get_platform_prompt(platform)

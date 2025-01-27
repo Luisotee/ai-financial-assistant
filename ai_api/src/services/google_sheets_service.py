@@ -5,16 +5,22 @@ from googleapiclient.errors import HttpError
 from datetime import datetime
 from typing import Optional
 import os
+from src.core.config import settings
+from pathlib import Path
 
 
 class GoogleSheetsService:
     def __init__(self):
+        # Get base project directory (3 levels up from service file)
+        base_dir = Path(__file__).parent.parent.parent.parent
+        creds_path = base_dir / settings.GOOGLE_ACCOUNT_FILE
+
         credentials = service_account.Credentials.from_service_account_file(
-            "/home/ubuntu/projects/ai-financial-assistant/credentials/credentials.json",
+            str(creds_path),
             scopes=["https://www.googleapis.com/auth/spreadsheets"],
         )
         self.service = build("sheets", "v4", credentials=credentials)
-        self.spreadsheet_id = "1JFNd7b77pqt-cBGGkH3hQvZ4fqcKVLgtRg6tx7qbIiU"
+        self.spreadsheet_id = settings.GOOGLE_SPREADSHEET_ID
 
     def _ensure_sheet_exists(self):
         try:
