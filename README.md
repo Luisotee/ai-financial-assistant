@@ -79,6 +79,11 @@ Required variables:
 yarn dev:ai
 ```
 
+The server will start at:
+
+- API: http://localhost:8000
+- Documentation: http://localhost:8000/docs
+
 ### API Endpoints
 
 ```bash

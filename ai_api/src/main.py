@@ -27,4 +27,8 @@ async def health_check():
 
 
 if __name__ == "__main__":
-    uvicorn.run("src.main:app", host="0.0.0.0", port=settings.PORT, reload=True)
+    port = settings.PORT
+    print(f"\nServer running at:")
+    print(f"  - API: http://localhost:{port}")
+    print(f"  - Documentation: http://localhost:{port}/docs")
+    uvicorn.run("src.main:app", host="localhost", port=port, reload=True)
