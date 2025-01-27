@@ -1,26 +1,34 @@
-from langchain_core.tools import Tool
+from langchain_core.tools import StructuredTool
+from pydantic import BaseModel, Field
 from src.services.google_sheets_service import GoogleSheetsService
+from typing import Optional
+
+
+class TransactionInput(BaseModel):
+    name: str = Field(..., description="Name or title of the transaction")
+    value: float = Field(
+        ...,
+        description="Transaction amount (positive for income, negative for expenses)",
+    )
+    description: str = Field(..., description="Description of the transaction")
 
 
 def get_sheets_tool():
     sheets_service = GoogleSheetsService()
 
-    def add_transaction(input_str: str) -> str:
-        """Add a transaction to Google Sheets. Input format: 'name|value|description'"""
+    @StructuredTool.from_function
+    def add_transaction(
+        name: str = Field(..., description="Name of transaction"),
+        value: float = Field(..., description="Transaction amount"),
+        description: str = Field(..., description="Transaction description"),
+    ) -> str:
+        """Add a financial transaction to Google Sheets with name, value, and description."""
         try:
-            name, value, description = input_str.split("|")
-            value = float(value)
-
             success = sheets_service.add_transaction(name, value, description)
-
             if success:
-                return f"Successfully added transaction: {name} - {value}"
-            return "Failed to add transaction"
+                return f"✅ Added transaction: {name} - ${abs(value)}"
+            return "❌ Failed to add transaction"
         except Exception as e:
-            return f"Error processing transaction: {str(e)}"
+            return f"Error: {str(e)}"
 
-    return Tool(
-        name="add_transaction",
-        func=add_transaction,
-        description="Add a transaction to Google Sheets. Input should be in format: 'name|value|description'",
-    )
+    return add_transaction
