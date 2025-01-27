@@ -3,6 +3,7 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.prebuilt import create_react_agent
 from src.core.config import settings
 from src.tools.search import get_search_tool
+from src.tools.sheets import get_sheets_tool
 import os
 
 
@@ -42,7 +43,7 @@ def create_agent(platform: str = "default"):
     prompt = get_platform_prompt(platform)
 
     try:
-        tools = [get_search_tool()]
+        tools = [get_search_tool(), get_sheets_tool()]  # Add the new tool
         return create_react_agent(
             model, tools, state_modifier=prompt, checkpointer=memory
         )

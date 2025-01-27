@@ -53,3 +53,4 @@ logs/
 .env.development
 .env.test
 .env.production
+credentials.json
