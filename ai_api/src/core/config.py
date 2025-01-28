@@ -25,15 +25,31 @@ class Settings(BaseSettings):
     GOOGLE_ACCOUNT_FILE: str = "credentials/credentials.json"
     GOOGLE_SPREADSHEET_ID: Optional[str] = None
 
+    # Groq Configuration
+    GROQ_API_KEY: Optional[str] = None
+    GROQ_MODEL_NAME: str = "llama-3.3-70b-versatile"
+    GROQ_MODEL_TEMPERATURE: float = 0.7
+
+    # Model Selection
+    MODEL_PROVIDER: str = "azure"  # "azure" or "groq"
+
     def validate_api_keys(self):
         # Get the base project directory (2 levels up from config.py)
         base_dir = Path(__file__).parent.parent.parent.parent
         creds_path = base_dir / self.GOOGLE_ACCOUNT_FILE
 
-        if not self.AZURE_OPENAI_API_KEY:
-            raise ValueError("AZURE_OPENAI_API_KEY is required")
-        if not self.AZURE_OPENAI_ENDPOINT:
-            raise ValueError("AZURE_OPENAI_ENDPOINT is required")
+        if self.MODEL_PROVIDER not in ["azure", "groq"]:
+            raise ValueError("MODEL_PROVIDER must be either 'azure' or 'groq'")
+
+        if self.MODEL_PROVIDER == "azure":
+            if not self.AZURE_OPENAI_API_KEY:
+                raise ValueError("AZURE_OPENAI_API_KEY is required for Azure")
+            if not self.AZURE_OPENAI_ENDPOINT:
+                raise ValueError("AZURE_OPENAI_ENDPOINT is required for Azure")
+        elif self.MODEL_PROVIDER == "groq":
+            if not self.GROQ_API_KEY:
+                raise ValueError("GROQ_API_KEY is required for Groq")
+
         if not self.SERPER_API_KEY:
             raise ValueError("SERPER_API_KEY is required")
         if not self.GOOGLE_SPREADSHEET_ID:

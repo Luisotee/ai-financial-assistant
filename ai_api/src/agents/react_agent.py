@@ -1,4 +1,5 @@
 from langchain_openai import AzureChatOpenAI
+from langchain_groq import ChatGroq
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.prebuilt import create_react_agent
 from src.core.config import settings
@@ -56,18 +57,31 @@ Assistant: Recording your income.
     return f"{base_prompt}\n\n{platform_prompts.get(platform.lower(), platform_prompts['default'])}"
 
 
+def get_llm_model():
+    """Get the appropriate LLM model based on configuration."""
+    if settings.MODEL_PROVIDER == "azure":
+        return AzureChatOpenAI(
+            model_name=settings.AZURE_MODEL_NAME,
+            api_key=settings.AZURE_OPENAI_API_KEY,
+            azure_endpoint=settings.AZURE_OPENAI_ENDPOINT,
+            openai_api_version="2024-02-15-preview",
+            temperature=settings.AZURE_MODEL_TEMPERATURE,
+        )
+    elif settings.MODEL_PROVIDER == "groq":
+        return ChatGroq(
+            api_key=settings.GROQ_API_KEY,
+            model_name=settings.GROQ_MODEL_NAME,
+            temperature=settings.GROQ_MODEL_TEMPERATURE,
+        )
+    else:
+        raise ValueError(f"Unknown model provider: {settings.MODEL_PROVIDER}")
+
+
 def create_agent(platform: str = "default"):
     settings.validate_api_keys()
 
     memory = MemorySaver()
-    model = AzureChatOpenAI(
-        model_name=settings.AZURE_MODEL_NAME,
-        api_key=settings.AZURE_OPENAI_API_KEY,
-        azure_endpoint=settings.AZURE_OPENAI_ENDPOINT,
-        openai_api_version="2024-02-15-preview",
-        temperature=settings.AZURE_MODEL_TEMPERATURE,
-    )
-
+    model = get_llm_model()
     prompt = get_platform_prompt(platform)
 
     try:
